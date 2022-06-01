@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brac Bank and Brac Agent Locations</title>
+
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+    <link rel="stylesheet" href="assets/lib/Leaflet.PolylineMeasure.css"/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="assets/lib/Leaflet.PolylineMeasure.js"></script>
+
+    <script src="assets/bb_agent_banking.js"></script>
+    <script src="assets/bb_branch_office.js"></script>
+
+    <style type="text/css">
+        html,
+        body {
+            font-family: sans-serif;
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #map {
+            position: absolute;
+            right: 0;
+            left: 0;
+            top: 0;
+            bottom: 0;
+        }
+    
+        
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        var map = L.map('map').setView([23.8103, 90.4125], 7);
+        var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3']
+        });
+        googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3']
+        });
+        googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3']
+        });
+
+        map.addControl(new L.Control.Layers({'OSM':OpenStreetMap_Mapnik, 'Satellite':googleSat,  'Hybrid':googleHybrid, 'Street': googleStreets}));
+
+
+
+        var b_br_style = {
+            radius: 5,
+            fillColor: "#4B63EF",
+            color: "#0C00B3",
+            weight: .5,
+            opacity: 1,
+            fillOpacity: 0.8
+        };
+
+        var b_ag_style = {
+            radius: 5,
+            fillColor: "#ff7800",
+            color: "#000",
+            weight: .5,
+            opacity: 1,
+            fillOpacity: 0.8
+        };
+
+        function onEachBranch(feature, layer) {
+            var popupContent = feature.properties.branch_nam;
+            layer.bindPopup(popupContent);
+
+            layer.on('mouseover', function () {
+                this.openPopup();
+            });
+            layer.on('mouseout', function () {
+                this.closePopup();
+            });
+
+        }
+
+        function onEachAgent(feature, layer) {
+            var popupContent = feature.properties.Agent_Bank;
+            layer.bindPopup(popupContent);
+
+            layer.on('mouseover', function () {
+                this.openPopup();
+            });
+            layer.on('mouseout', function () {
+                this.closePopup();
+            });
+
+        }
+
+
+        var b_br_layer = L.geoJSON(b_br, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, b_br_style);
+            },
+            onEachFeature: onEachBranch,
+        }).addTo(map);
+
+        var b_ag_layer = L.geoJSON(b_ag, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, b_ag_style);
+            },
+            onEachFeature: onEachAgent,
+        }).addTo(map);
+
+        let polylineMeasure = L.control.polylineMeasure ({position:'topleft', unit:'kilometres', showBearings:true, clearMeasurementsOnStop: false, showClearControl: true, showUnitControl: true});
+        polylineMeasure.addTo (map);
+
+    </script>
+</body>
+</html>
