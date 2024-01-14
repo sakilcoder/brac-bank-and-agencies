@@ -14,6 +14,7 @@
 
     <script src="assets/bb_agent_banking.js"></script>
     <script src="assets/bb_branch_office.js"></script>
+    <script src="assets/aoi.js"></script>
 
     <style type="text/css">
         html,
@@ -106,6 +107,9 @@
             });
 
         }
+
+        var aoiLayer = L.geoJSON(aoi, {
+        }).addTo(map);
 
 
         var b_br_layer = L.geoJSON(b_br, {
